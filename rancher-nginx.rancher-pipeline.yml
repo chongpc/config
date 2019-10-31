@@ -1,0 +1,18 @@
+stages:
+- name: build
+  steps:
+  - runScriptConfig:
+      image: maven:3.5.3-jdk-8-alpine
+      shellScript: mvn clean package
+- name: rancher-nginx
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: scc/hyperloop-baseapi:${CICD_EXECUTION_SEQUENCE}
+      pushRemote: true
+      registry: registry.cn-hangzhou.aliyuncs.com
+- name: deploy
+  steps:
+  - applyYamlConfig:
+      path: ./deployment.yaml
